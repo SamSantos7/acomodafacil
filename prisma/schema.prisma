@@ -1,0 +1,74 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int           @id @default(autoincrement())
+  name      String?
+  email     String        @unique
+  password  String
+  photo     String?
+  provider  String?
+  createdAt DateTime      @default(now()) @map("created_at")
+  reservations Reservation[]
+  uploads    Upload[]
+  otps       OTP[]
+
+  @@map("users")
+}
+
+model Accommodation {
+  id          Int           @id @default(autoincrement())
+  name        String
+  city        String
+  country     String
+  description String
+  price       Decimal
+  images      String[]
+  createdAt   DateTime      @default(now()) @map("created_at")
+  reservations Reservation[]
+
+  @@map("accommodations")
+}
+
+model Reservation {
+  id              Int           @id @default(autoincrement())
+  userId          Int           @map("user_id")
+  accommodationId Int           @map("accommodation_id")
+  startDate       DateTime      @map("start_date")
+  endDate         DateTime      @map("end_date")
+  status          String
+  createdAt       DateTime      @default(now()) @map("created_at")
+  user            User          @relation(fields: [userId], references: [id])
+  accommodation   Accommodation @relation(fields: [accommodationId], references: [id])
+
+  @@map("reservations")
+}
+
+model Upload {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  fileUrl   String   @map("file_url")
+  fileType  String   @map("file_type")
+  createdAt DateTime @default(now()) @map("created_at")
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@map("uploads")
+}
+
+model OTP {
+  id        Int      @id @default(autoincrement())
+  email     String
+  code      String
+  used      Boolean  @default(false)
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  user      User?    @relation(fields: [email], references: [email])
+
+  @@map("otps")
+} 
