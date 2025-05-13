@@ -17,11 +17,28 @@ interface AuthModalProps {
 }
 
 const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
-  const [email, setEmail] = useState('');
+  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState("email");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
+  const [showOtpInput, setShowOtpInput] = useState(false);
+  const [otpValue, setOtpValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [emailError, setEmailError] = useState("");
   const { toast } = useToast();
+
+  // Resetar estados quando o modal é aberto/fechado
+  useEffect(() => {
+    if (!isOpen) {
+      // Pequeno delay para não afetar a animação de fechamento
+      setTimeout(() => {
+        setShowOtpInput(false);
+        setOtpValue("");
+        setEmailError("");
+      }, 300);
+    }
+  }, [isOpen]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,26 +70,6 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
       setIsLoading(false);
     }
   };
-  const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState("email");
-  const [email, setEmail] = useState("");
-  const [showOtpInput, setShowOtpInput] = useState(false);
-  const [otpValue, setOtpValue] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [emailError, setEmailError] = useState("");
-
-  // Resetar estados quando o modal é aberto/fechado
-  useEffect(() => {
-    if (!isOpen) {
-      // Pequeno delay para não afetar a animação de fechamento
-      setTimeout(() => {
-        setShowOtpInput(false);
-        setOtpValue("");
-        setEmailError("");
-      }, 300);
-    }
-  }, [isOpen]);
-
   const validateEmail = (email: string) => {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return re.test(email);
