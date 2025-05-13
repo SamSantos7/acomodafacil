@@ -1,34 +1,38 @@
 import NextAuth from "next-auth";
 import EmailProvider from "next-auth/providers/email";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
-import { prisma } from "../../../lib/prisma";
+import { db } from "@/lib/db";
 
 export default NextAuth({
-  adapter: PrismaAdapter(prisma),
+  adapter: PrismaAdapter(db),
   providers: [
     EmailProvider({
       server: {
-        host: process.env.SMTP_HOST,
-        port: Number(process.env.SMTP_PORT),
+        host: process.env.EMAIL_SERVER_HOST,
+        port: process.env.EMAIL_SERVER_PORT,
         auth: {
-          user: process.env.SMTP_USER,
-          pass: process.env.SMTP_PASS,
+          user: process.env.EMAIL_SERVER_USER,
+          pass: process.env.EMAIL_SERVER_PASSWORD,
         },
       },
-      from: process.env.SMTP_FROM,
+      from: process.env.EMAIL_FROM,
     }),
   ],
   pages: {
-    signIn: "/auth/login",
-    verifyRequest: "/auth/verify-request",
-    error: "/auth/error",
+    signIn: "/login",
+    signOut: "/",
+    error: "/error",
+    verifyRequest: "/verify-request",
+  },
+  session: {
+    strategy: "jwt",
   },
   callbacks: {
-    async session({ session, user }) {
-      session.user.id = user.id;
-      session.user.role = user.role;
+    async session({ session, token }) {
+      if (token.sub && session.user) {
+        session.user.id = token.sub;
+      }
       return session;
     },
   },
-  secret: process.env.JWT_SECRET,
 });
