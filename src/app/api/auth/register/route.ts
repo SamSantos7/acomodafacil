@@ -1,6 +1,7 @@
 
 import { db } from "@/lib/db";
-import { hash } from "bcrypt";
+import { NextResponse } from "next/server";
+import bcryptjs from "bcryptjs"; // Alterado de bcrypt para bcryptjs
 
 export async function POST(req: Request) {
   try {
@@ -16,7 +17,8 @@ export async function POST(req: Request) {
     }
 
     // Hash da senha
-    const hashedPassword = await hash(password, 10);
+    // Onde você usa bcrypt, substitua por bcryptjs:
+    const hashedPassword = await bcryptjs.hash(password, 10);
 
     // Criar usuário
     const user = await db.user.create({
