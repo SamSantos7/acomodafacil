@@ -151,4 +151,100 @@ export const mockApi = {
   }
 };
 
+// Serviço de API simulada para desenvolvimento
+
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  avatar?: string;
+}
+
+interface LoginResponse {
+  user: User;
+  token: string;
+}
+
+const mockApi = {
+  login: async (email: string, password: string): Promise<LoginResponse> => {
+    // Simular um atraso de rede
+    await new Promise(resolve => setTimeout(resolve, 800));
+    
+    // Verificar credenciais (simulado)
+    if (email === 'teste@exemplo.com' && password === 'senha123') {
+      return {
+        user: {
+          id: '123',
+          name: 'Usuário Teste',
+          email: 'teste@exemplo.com',
+          avatar: 'https://i.pravatar.cc/150?u=123'
+        },
+        token: 'jwt-token-simulado-123456789'
+      };
+    }
+    
+    // Simular login para qualquer email com senha não vazia
+    if (password && password.length > 0) {
+      const username = email.split('@')[0];
+      return {
+        user: {
+          id: Math.random().toString(36).substring(2, 9),
+          name: username.charAt(0).toUpperCase() + username.slice(1),
+          email: email,
+          avatar: `https://i.pravatar.cc/150?u=${email}`
+        },
+        token: `jwt-token-simulado-${Math.random().toString(36).substring(2, 15)}`
+      };
+    }
+    
+    // Se as credenciais não forem válidas
+    throw new Error('Email ou senha inválidos');
+  },
+  
+  register: async (name: string, email: string, password: string): Promise<LoginResponse> => {
+    // Simular um atraso de rede
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // Simular registro (em um sistema real, verificaríamos se o email já existe)
+    return {
+      user: {
+        id: Math.random().toString(36).substring(2, 9),
+        name: name,
+        email: email,
+        avatar: `https://i.pravatar.cc/150?u=${email}`
+      },
+      token: `jwt-token-simulado-${Math.random().toString(36).substring(2, 15)}`
+    };
+  },
+  
+  sendOtp: async (email: string): Promise<{ success: boolean }> => {
+    // Simular um atraso de rede
+    await new Promise(resolve => setTimeout(resolve, 1200));
+    
+    // Simular envio de OTP (em um sistema real, enviaríamos um email)
+    return { success: true };
+  },
+  
+  verifyOtp: async (email: string, otp: string): Promise<LoginResponse> => {
+    // Simular um atraso de rede
+    await new Promise(resolve => setTimeout(resolve, 800));
+    
+    // Simular verificação de OTP (em um sistema real, verificaríamos o código)
+    if (otp.length === 5) {
+      const username = email.split('@')[0];
+      return {
+        user: {
+          id: Math.random().toString(36).substring(2, 9),
+          name: username.charAt(0).toUpperCase() + username.slice(1),
+          email: email,
+          avatar: `https://i.pravatar.cc/150?u=${email}`
+        },
+        token: `jwt-token-simulado-${Math.random().toString(36).substring(2, 15)}`
+      };
+    }
+    
+    throw new Error('Código OTP inválido');
+  }
+};
+
 export default mockApi;

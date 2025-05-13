@@ -168,23 +168,104 @@ function toast({ ...props }: Toast) {
   }
 }
 
-function useToast() {
-  const [state, setState] = React.useState<State>(memoryState)
+import { useState, useEffect, useCallback } from "react";
 
-  React.useEffect(() => {
-    listeners.push(setState)
-    return () => {
-      const index = listeners.indexOf(setState)
-      if (index > -1) {
-        listeners.splice(index, 1)
-      }
+export type ToastProps = {
+  id: string;
+  title?: string;
+  description?: string;
+  action?: React.ReactNode;
+  variant?: "default" | "destructive";
+};
+
+export type Toast = ToastProps;
+
+const TOAST_TIMEOUT = 5000;
+
+export function useToast() {
+  const [toasts, setToasts] = useState<Toast[]>([]);
+
+  useEffect(() => {
+    if (toasts.length > 0) {
+      const timer = setTimeout(() => {
+        setToasts((toasts) => toasts.slice(1));
+      }, TOAST_TIMEOUT);
+
+      return () => clearTimeout(timer);
     }
-  }, [state])
+  }, [toasts]);
+
+  const toast = useCallback(
+    ({ title, description, action, variant = "default" }: Omit<Toast, "id">) => {
+      const id = Math.random().toString(36).substring(2, 9);
+      const newToast: Toast = {
+        id,
+        title,
+        description,
+        action,
+        variant,
+      };
+
+      setToasts((toasts) => [...toasts, newToast]);
+
+      return {
+        id,
+        dismiss: () => setToasts((toasts) => toasts.filter((t) => t.id !== id)),
+      };
+    },
+    []
+  );
+
+  const dismiss = useCallback((id: string) => {
+    setToasts((toasts) => toasts.filter((t) => t.id !== id));
+  }, []);
 
   return {
-    ...state,
+    toasts,
     toast,
-    dismiss: (toastId?: string) => dispatch({ type: "DISMISS_TOAST", toastId }),
+    dismiss,
+  };
+}
+
+const listeners: Array<(state: State) => void> = []
+
+let memoryState: State = { toasts: [] }
+
+function dispatch(action: Action) {
+  memoryState = reducer(memoryState, action)
+  listeners.forEach((listener) => {
+    listener(memoryState)
+  })
+}
+
+type Toast = Omit<ToasterToast, "id">
+
+function toast({ ...props }: Toast) {
+  const id = genId()
+
+  const update = (props: ToasterToast) =>
+    dispatch({
+      type: "UPDATE_TOAST",
+      toast: { ...props, id },
+    })
+  const dismiss = () => dispatch({ type: "DISMISS_TOAST", toastId: id })
+
+  dispatch({
+    type: "ADD_TOAST",
+    toast: {
+      ...props,
+      id,
+      open: true,
+      onOpenChange: (open) => {
+        if (!open) dismiss()
+      },
+    },
+  })
+
+  return {
+    id: id,
+    dismiss,
+    update,
   }
 }
 
