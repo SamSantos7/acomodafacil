@@ -3,10 +3,8 @@ import React from 'react';
 import Hero from '@/components/Hero';
 import DestinationSection from '@/components/DestinationSection';
 import FeaturedAccommodations from '@/components/FeaturedAccommodations';
-// Remova esta linha:
-// import WhyChooseUs from '@/components/WhyChooseUs';
-// Use esta linha:
-import WhyChooseUs from '@/components/layout/WhyChooseUs';
+// Remova a importação problemática
+import WhyChooseUs from '@/components/WhyChooseUs';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 
