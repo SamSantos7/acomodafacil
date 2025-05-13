@@ -12,11 +12,17 @@ import DashboardSidebar from '@/components/DashboardSidebar';
 import ReferralForm from '@/components/ReferralForm';
 import DocumentUpload from '@/components/DocumentUpload';
 
+import mockApi from '@/services/mockApi';
+
 const Dashboard = () => {
   const { toast } = useToast();
   const [searchParams] = useSearchParams();
   const tabFromUrl = searchParams.get('tab');
   const [activeTab, setActiveTab] = useState(tabFromUrl || "reservations");
+  const [user, setUser] = useState<any>(null);
+  const [reservations, setReservations] = useState([]);
+  const [documents, setDocuments] = useState([]);
+  const [loading, setLoading] = useState(true);
   
   // Atualizar o activeTab quando o parâmetro da URL mudar
   useEffect(() => {
@@ -24,6 +30,36 @@ const Dashboard = () => {
       setActiveTab(tabFromUrl);
     }
   }, [tabFromUrl]);
+  
+  // Carregar dados do usuário e outros dados relacionados
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        
+        // Usar o mockApi em vez de chamadas fetch diretas
+        const userData = await mockApi.getUser();
+        setUser(userData.user);
+        
+        const reservationsData = await mockApi.getReservations();
+        setReservations(reservationsData.reservations);
+        
+        const documentsData = await mockApi.getDocuments();
+        setDocuments(documentsData.documents);
+      } catch (error) {
+        console.error('Erro ao carregar dados:', error);
+        toast({
+          title: "Erro",
+          description: "Não foi possível carregar seus dados. Tente novamente.",
+          variant: "destructive"
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchData();
+  }, [toast]);
   
   return (
     <div className="min-h-screen flex flex-col">

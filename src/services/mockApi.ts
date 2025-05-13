@@ -1,0 +1,154 @@
+// Serviço de mock para simular respostas da API
+import { v4 as uuidv4 } from 'uuid';
+
+// Tipos
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: 'user' | 'admin';
+  avatar?: string;
+}
+
+interface Reservation {
+  id: string;
+  accommodationId: string;
+  accommodationName: string;
+  location: string;
+  country: string;
+  startDate: string;
+  endDate: string;
+  status: 'pending' | 'confirmed' | 'cancelled';
+  price: number;
+  imageUrl: string;
+}
+
+interface Document {
+  id: string;
+  userId: string;
+  name: string;
+  fileUrl: string;
+  uploadDate: string;
+  status: 'pending' | 'approved' | 'rejected';
+}
+
+// Mock de dados
+const mockUsers: User[] = [
+  {
+    id: '1',
+    name: 'Samuel Santos',
+    email: 'samuel.santos@exemplo.com',
+    role: 'user',
+    avatar: 'https://i.pravatar.cc/150?u=user1'
+  },
+  {
+    id: '2',
+    name: 'Admin User',
+    email: 'admin@acomodafacil.com',
+    role: 'admin',
+    avatar: 'https://i.pravatar.cc/150?u=admin'
+  }
+];
+
+const mockReservations: Reservation[] = [
+  {
+    id: 'res1',
+    accommodationId: 'acc1',
+    accommodationName: 'Student Housing Dublin',
+    location: 'Dublin, Irlanda',
+    country: 'Irlanda',
+    startDate: '2023-01-10',
+    endDate: '2023-02-10',
+    status: 'confirmed',
+    price: 800,
+    imageUrl: 'https://images.unsplash.com/photo-1515263487990-61b07816b324?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60'
+  },
+  {
+    id: 'res2',
+    accommodationId: 'acc2',
+    accommodationName: 'Toronto Student Residence',
+    location: 'Toronto, Canadá',
+    country: 'Canadá',
+    startDate: '2023-03-15',
+    endDate: '2023-06-15',
+    status: 'pending',
+    price: 950,
+    imageUrl: 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60'
+  }
+];
+
+const mockDocuments: Document[] = [
+  {
+    id: 'doc1',
+    userId: '1',
+    name: 'Passaporte.pdf',
+    fileUrl: 'https://example.com/documents/passport.pdf',
+    uploadDate: '2023-01-05',
+    status: 'approved'
+  },
+  {
+    id: 'doc2',
+    userId: '1',
+    name: 'Comprovante_Matricula.pdf',
+    fileUrl: 'https://example.com/documents/enrollment.pdf',
+    uploadDate: '2023-01-07',
+    status: 'pending'
+  }
+];
+
+// Funções de API simuladas
+export const mockApi = {
+  // Autenticação
+  login: async (email: string, password: string) => {
+    // Simular delay de rede
+    await new Promise(resolve => setTimeout(resolve, 800));
+    
+    const user = mockUsers.find(u => u.email === email);
+    
+    if (!user) {
+      throw new Error('Usuário não encontrado');
+    }
+    
+    // Simular autenticação bem-sucedida (em produção, verificaria a senha)
+    return {
+      user,
+      token: 'mock-jwt-token-' + uuidv4()
+    };
+  },
+  
+  // Dados do usuário
+  getUser: async () => {
+    await new Promise(resolve => setTimeout(resolve, 500));
+    return { user: mockUsers[0] };
+  },
+  
+  // Reservas
+  getReservations: async () => {
+    await new Promise(resolve => setTimeout(resolve, 700));
+    return { reservations: mockReservations };
+  },
+  
+  // Documentos
+  getDocuments: async () => {
+    await new Promise(resolve => setTimeout(resolve, 600));
+    return { documents: mockDocuments };
+  },
+  
+  // Upload de documento
+  uploadDocument: async (name: string, file: File) => {
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    const newDoc: Document = {
+      id: 'doc-' + uuidv4().substring(0, 8),
+      userId: '1',
+      name,
+      fileUrl: URL.createObjectURL(file),
+      uploadDate: new Date().toISOString(),
+      status: 'pending'
+    };
+    
+    return { document: newDoc };
+  }
+};
+
+export default mockApi;

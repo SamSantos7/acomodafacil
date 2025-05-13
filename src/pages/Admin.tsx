@@ -8,10 +8,74 @@ import { Search, Plus, Edit, Trash2, User, Building, MapPin, Calendar } from 'lu
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { useToast } from '@/hooks/use-toast';
+import mockApi from '@/services/mockApi';
 
 const Admin = () => {
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [accommodations, setAccommodations] = useState([]);
+  const [users, setUsers] = useState([]);
+  
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        
+        // Aqui poderíamos adicionar chamadas para dados administrativos
+        // Por enquanto, vamos apenas simular o carregamento
+        await new Promise(resolve => setTimeout(resolve, 800));
+        
+        // Dados de exemplo
+        setAccommodations([
+          {
+            id: 'A001',
+            name: 'Student Housing Dublin',
+            city: 'Dublin',
+            type: 'Residência',
+            price: '€800/mês',
+            status: 'Ativo'
+          },
+          {
+            id: 'A002',
+            name: 'Toronto Student Residence',
+            city: 'Toronto',
+            type: 'Apartamento',
+            price: '€950/mês',
+            status: 'Ativo'
+          }
+        ]);
+        
+        setUsers([
+          {
+            id: 'U001',
+            name: 'Samuel Santos',
+            email: 'samuel.santos@exemplo.com',
+            status: 'Ativo',
+            role: 'Estudante'
+          },
+          {
+            id: 'U002',
+            name: 'Maria Silva',
+            email: 'maria.silva@exemplo.com',
+            status: 'Ativo',
+            role: 'Estudante'
+          }
+        ]);
+      } catch (error) {
+        console.error('Erro ao carregar dados administrativos:', error);
+        toast({
+          title: "Erro",
+          description: "Não foi possível carregar os dados administrativos.",
+          variant: "destructive"
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchData();
+  }, [toast]);
   
   const handleDelete = (id: string, type: string) => {
     toast({

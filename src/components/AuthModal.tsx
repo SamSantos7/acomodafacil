@@ -9,6 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
 import { motion } from 'framer-motion';
+import mockApi from '@/services/mockApi';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -16,7 +17,42 @@ interface AuthModalProps {
 }
 
 const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    
+    try {
+      // Usar o mockApi em vez de chamadas fetch diretas
+      const data = await mockApi.login(email, password);
+      
+      // Armazenar dados do usuário e token
+      localStorage.setItem('user', JSON.stringify(data.user));
+      localStorage.setItem('token', data.token);
+      
+      toast({
+        title: "Login realizado com sucesso",
+        description: "Bem-vindo de volta!",
+      });
+      
+      onClose();
+      window.location.reload(); // Recarregar para atualizar o estado da aplicação
+    } catch (error) {
+      console.error('Erro de login:', error);
+      toast({
+        title: "Erro de login",
+        description: error instanceof Error ? error.message : "Ocorreu um erro durante o login",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("email");
   const [email, setEmail] = useState("");
