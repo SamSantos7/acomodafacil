@@ -42,7 +42,7 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
     return re.test(email);
   };
 
-  const handleEmailLogin = (e: React.FormEvent) => {
+  const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     
     setEmailError("");
@@ -59,8 +59,19 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
     
     setIsLoading(true);
     
-    // Simular envio de código OTP
-    setTimeout(() => {
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Erro ao solicitar código');
+      }
+
       setIsLoading(false);
       setShowOtpInput(true);
       
@@ -68,10 +79,13 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
         title: "Código enviado!",
         description: "Um código de verificação foi enviado para seu e-mail.",
       });
-    }, 1500);
+    } catch (err) {
+      setIsLoading(false);
+      setEmailError(err instanceof Error ? err.message : 'Erro ao solicitar código');
+    }
   };
 
-  const handleOtpSubmit = (e: React.FormEvent) => {
+  const handleOtpSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (otpValue.length !== 5) {
@@ -85,20 +99,22 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
     
     setIsLoading(true);
     
-    // Simular verificação do código OTP
-    setTimeout(() => {
-      setIsLoading(false);
-      
-      // Simular login bem-sucedido
-      const mockUser = {
-        id: 'user123',
-        name: 'João Silva',
-        email: email,
-        avatar: 'https://i.pravatar.cc/150?u=user',
-      };
-      
-      // Salvar informações do usuário no localStorage (temporário, seria substituído por uma solução real de autenticação)
-      localStorage.setItem('user', JSON.stringify(mockUser));
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, otp: otpValue })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Código inválido ou expirado');
+      }
+
+      // Salvar token no localStorage
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
       
       toast({
         title: "Login realizado!",
@@ -107,7 +123,14 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
       
       onClose();
       navigate('/dashboard');
-    }, 1500);
+    } catch (err) {
+      setIsLoading(false);
+      toast({
+        title: "Erro",
+        description: err instanceof Error ? err.message : 'Erro ao verificar código',
+        variant: "destructive",
+      });
+    }
   };
 
   const handleSocialLogin = (provider: string) => {
