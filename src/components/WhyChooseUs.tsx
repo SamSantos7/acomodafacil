@@ -57,4 +57,5 @@ const WhyChooseUs = () => {
 };
 
 export default WhyChooseUs;
-export { default } from './layout/WhyChooseUs';
+// Remova esta linha para resolver o erro
+// export { default } from './layout/WhyChooseUs';
