@@ -3,12 +3,11 @@ import React from 'react';
 import Hero from '@/components/Hero';
 import DestinationSection from '@/components/DestinationSection';
 import FeaturedAccommodations from '@/components/FeaturedAccommodations';
-// Remova a importação problemática
 import WhyChooseUs from '@/components/WhyChooseUs';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 
-const Index = () => {
+const Home = () => {
   return (
     <div>
       <Navbar />
@@ -21,4 +20,4 @@ const Index = () => {
   );
 };
 
-export default Index;
+export default Home;
