@@ -37,4 +37,27 @@ export default async function handler(req, res) {
       
       if (fileType.includes('pdf')) {
         type = 'PDF';
-      } else if (fileType.includes('word')
+      } else if (fileType.includes('word')) {
+        type = 'DOCX';
+      } else {
+        type = 'OUTRO';
+      }
+      
+      // Continuar com o restante da implementação
+      const file = files.file[0];
+      const name = fields.name[0];
+      const userId = fields.userId[0] || session.user.id;
+
+      // Verificar tipo de arquivo
+      const fileType = file.mimetype;
+      let type;
+      
+      if (fileType.includes('pdf')) {
+        type = 'PDF';
+      } else if (fileType.includes('word')) {
+        type = 'DOCX';
+      } else {
+        type = 'OUTRO';
+      }
+      
+      // Continuar com o restante da implementação

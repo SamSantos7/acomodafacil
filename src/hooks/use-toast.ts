@@ -227,7 +227,8 @@ export function useToast() {
   };
 }
 
-const listeners: Array<(state: State) => void> = []
+// Remover a linha duplicada:
+// const listeners: Array<(state: State) => void> = []
 
 let memoryState: State = { toasts: [] }
 

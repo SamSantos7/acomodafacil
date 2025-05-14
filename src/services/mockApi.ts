@@ -153,19 +153,20 @@ export const mockApi = {
 
 // Serviço de API simulada para desenvolvimento
 
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  avatar?: string;
-}
+// Remover esta segunda definição de mockApi e suas interfaces associadas
+// interface User {
+//   id: string;
+//   name: string;
+//   email: string;
+//   avatar?: string;
+// }
 
-interface LoginResponse {
-  user: User;
-  token: string;
-}
+// interface LoginResponse {
+//   user: User;
+//   token: string;
+// }
 
-const mockApi = {
+// const mockApi = {
   login: async (email: string, password: string): Promise<LoginResponse> => {
     // Simular um atraso de rede
     await new Promise(resolve => setTimeout(resolve, 800));
