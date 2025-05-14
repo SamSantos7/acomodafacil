@@ -1,56 +1,64 @@
-import NextAuth from "next-auth";
-import EmailProvider from "next-auth/providers/email";
-import { PrismaAdapter } from "@next-auth/prisma-adapter";
-import { db } from "@/lib/db";
+import NextAuth from 'next-auth';
+import CredentialsProvider from 'next-auth/providers/credentials';
+import { db } from '@/lib/db';
+import bcryptjs from 'bcryptjs';
 
 export default NextAuth({
-  adapter: PrismaAdapter(db),
   providers: [
-    EmailProvider({
-      server: {
-        host: process.env.EMAIL_SERVER_HOST,
-        port: process.env.EMAIL_SERVER_PORT,
-        auth: {
-          user: process.env.EMAIL_SERVER_USER,
-          pass: process.env.EMAIL_SERVER_PASSWORD,
-        },
+    CredentialsProvider({
+      name: 'Credentials',
+      credentials: {
+        email: { label: "Email", type: "email" },
+        password: { label: "Senha", type: "password" }
       },
-      from: process.env.EMAIL_FROM,
-    }),
+      async authorize(credentials) {
+        if (!credentials?.email || !credentials?.password) {
+          return null;
+        }
+
+        const user = await db.user.findUnique({
+          where: { email: credentials.email }
+        });
+
+        if (!user || !user.password) {
+          return null;
+        }
+
+        const isPasswordValid = await bcryptjs.compare(
+          credentials.password,
+          user.password
+        );
+
+        if (!isPasswordValid) {
+          return null;
+        }
+
+        return {
+          id: user.id,
+          email: user.email,
+          name: user.name
+        };
+      }
+    })
   ],
-  pages: {
-    signIn: "/login",
-    signOut: "/",
-    error: "/error",
-    verifyRequest: "/verify-request",
-  },
   session: {
-    strategy: "jwt",
+    strategy: 'jwt'
+  },
+  pages: {
+    signIn: '/login',
   },
   callbacks: {
-    async session({ session, token }) {
-      if (token.sub && session.user) {
-        session.user.id = token.sub;
-      }
-      return session;
-    },
-    // Adicionar callback para JWT para garantir que o ID do usuário seja incluído
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
       }
       return token;
     },
-    // Garantir que as respostas de erro sejam formatadas como JSON
-    async redirect({ url, baseUrl }) {
-      return url.startsWith(baseUrl) ? url : baseUrl;
+    async session({ session, token }) {
+      if (token && session.user) {
+        session.user.id = token.id as string;
+      }
+      return session;
     }
-  },
-  // Configurar para garantir respostas JSON
-  debug: process.env.NODE_ENV === 'development',
-  secret: process.env.NEXTAUTH_SECRET,
-  // Garantir que as sessões expirem após 7 dias
-  session: {
-    maxAge: 7 * 24 * 60 * 60, // 7 dias
   }
 });

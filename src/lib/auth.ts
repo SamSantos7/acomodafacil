@@ -1,30 +1,42 @@
-import { compare, hash } from 'bcryptjs';
-import { sign, verify } from 'jsonwebtoken';
-import { PrismaClient } from '@prisma/client';
+import jwt from 'jsonwebtoken';
+import { db } from './db';
 
-const prisma = new PrismaClient();
-
-export async function hashPassword(password: string) {
-  return await hash(password, 10);
-}
-
-export async function verifyPassword(password: string, hashedPassword: string) {
-  return await compare(password, hashedPassword);
-}
-
-export function generateToken(userId: number) {
-  return sign({ userId }, process.env.JWT_SECRET!, { expiresIn: '7d' });
-}
-
-export async function verifyToken(token: string) {
+// Função para verificar autenticação
+export async function verifyAuth(token?: string): Promise<string | null> {
+  if (!token) return null;
+  
   try {
-    const decoded = verify(token, process.env.JWT_SECRET!) as { userId: number };
-    const user = await prisma.user.findUnique({
-      where: { id: decoded.userId },
+    // Verificar o token JWT
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback_secret') as { id: string };
+    
+    // Verificar se o usuário existe
+    const user = await db.user.findUnique({
+      where: { id: decoded.id }
+    });
+    
+    if (!user) return null;
+    
+    return user.id;
+  } catch (error) {
+    console.error('Erro na verificação de autenticação:', error);
+    return null;
+  }
+}
+
+// Função para verificar token (usada em outras partes do código)
+export async function verifyToken(token?: string) {
+  if (!token) return null;
+  
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback_secret') as { id: string };
+    
+    const user = await db.user.findUnique({
+      where: { id: decoded.id },
       select: { id: true, email: true, name: true }
     });
+    
     return user;
   } catch (error) {
     return null;
   }
-} 
+}
