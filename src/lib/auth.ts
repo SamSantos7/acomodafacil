@@ -23,6 +23,15 @@ export async function verifyAuth(token?: string): Promise<string | null> {
   }
 }
 
+// Função para gerar token JWT
+export function generateToken(userId: string): string {
+  return jwt.sign(
+    { id: userId },
+    process.env.JWT_SECRET || 'fallback_secret',
+    { expiresIn: '7d' }
+  );
+}
+
 // Função para verificar token (usada em outras partes do código)
 export async function verifyToken(token?: string) {
   if (!token) return null;
