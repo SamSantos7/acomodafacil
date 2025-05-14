@@ -32,6 +32,11 @@ interface Document {
   status: 'pending' | 'approved' | 'rejected';
 }
 
+interface LoginResponse {
+  user: User;
+  token: string;
+}
+
 // Mock de dados
 const mockUsers: User[] = [
   {
@@ -99,7 +104,7 @@ const mockDocuments: Document[] = [
 // Funções de API simuladas
 export const mockApi = {
   // Autenticação
-  login: async (email: string, password: string) => {
+  login: async (email: string, password: string): Promise<LoginResponse> => {
     // Simular delay de rede
     await new Promise(resolve => setTimeout(resolve, 800));
     
@@ -148,6 +153,54 @@ export const mockApi = {
     };
     
     return { document: newDoc };
+  },
+  
+  // OTP (One-Time Password)
+  sendOtp: async (email: string): Promise<{ success: boolean }> => {
+    // Simular um atraso de rede
+    await new Promise(resolve => setTimeout(resolve, 1200));
+    
+    // Simular envio de OTP (em um sistema real, enviaríamos um email)
+    return { success: true };
+  },
+  
+  verifyOtp: async (email: string, otp: string): Promise<LoginResponse> => {
+    // Simular um atraso de rede
+    await new Promise(resolve => setTimeout(resolve, 800));
+    
+    // Simular verificação de OTP (em um sistema real, verificaríamos o código)
+    if (otp.length === 5) {
+      const username = email.split('@')[0];
+      return {
+        user: {
+          id: Math.random().toString(36).substring(2, 9),
+          name: username.charAt(0).toUpperCase() + username.slice(1),
+          email: email,
+          avatar: `https://i.pravatar.cc/150?u=${email}`,
+          role: 'user'
+        },
+        token: `jwt-token-simulado-${Math.random().toString(36).substring(2, 15)}`
+      };
+    }
+    
+    throw new Error('Código OTP inválido');
+  },
+  
+  register: async (name: string, email: string, password: string): Promise<LoginResponse> => {
+    // Simular um atraso de rede
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // Simular registro (em um sistema real, verificaríamos se o email já existe)
+    return {
+      user: {
+        id: Math.random().toString(36).substring(2, 9),
+        name: name,
+        email: email,
+        avatar: `https://i.pravatar.cc/150?u=${email}`,
+        role: 'user'
+      },
+      token: `jwt-token-simulado-${Math.random().toString(36).substring(2, 15)}`
+    };
   }
 };
 

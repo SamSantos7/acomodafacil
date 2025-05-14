@@ -1,5 +1,5 @@
-import { prisma } from '@/lib/prisma';
-import { verifyToken } from '@/lib/auth';
+// Importar o serviço de mock em vez de prisma
+import { mockApi } from '@/services/mockApi';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -12,12 +12,6 @@ export default async function handler(req, res) {
     
     if (!token) {
       return res.status(401).json({ error: 'Token não fornecido' });
-    }
-
-    const user = await verifyToken(token);
-    
-    if (!user) {
-      return res.status(401).json({ error: 'Token inválido' });
     }
 
     // Processar o upload do arquivo
@@ -38,18 +32,11 @@ export default async function handler(req, res) {
       type = 'OUTRO';
     }
     
-    // Salvar o documento no banco de dados
-    const document = await prisma.document.create({
-      data: {
-        userId: user.id,
-        name,
-        fileUrl,
-        fileType: type,
-        status: 'pending'
-      }
-    });
+    // Simular o upload usando o mockApi
+    const file = new File(["conteúdo simulado"], name, { type: fileType });
+    const result = await mockApi.uploadDocument(name, file);
 
-    return res.status(200).json({ document });
+    return res.status(200).json({ document: result.document });
   } catch (error) {
     console.error('Erro ao fazer upload:', error);
     return res.status(500).json({ error: 'Erro ao processar o upload' });
