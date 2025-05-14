@@ -1,16 +1,17 @@
 {
   "/_not-found/page": "app/_not-found/page.js",
+  "/admin/page": "app/admin/page.js",
   "/api/accommodation/add/route": "app/api/accommodation/add/route.js",
   "/api/accommodations/route": "app/api/accommodations/route.js",
-  "/api/auth/login/route": "app/api/auth/login/route.js",
   "/api/accommodation/list/route": "app/api/accommodation/list/route.js",
+  "/api/auth/login/route": "app/api/auth/login/route.js",
   "/api/auth/register/route": "app/api/auth/register/route.js",
   "/api/contact/route": "app/api/contact/route.js",
-  "/api/reservations/route": "app/api/reservations/route.js",
   "/api/test-email/route": "app/api/test-email/route.js",
-  "/api/upload/documents/route": "app/api/upload/documents/route.js",
+  "/api/reservations/route": "app/api/reservations/route.js",
   "/api/upload/route": "app/api/upload/route.js",
   "/api/user/route": "app/api/user/route.js",
+  "/api/upload/documents/route": "app/api/upload/documents/route.js",
   "/login/page": "app/login/page.js",
   "/dashboard/page": "app/dashboard/page.js"
 }
