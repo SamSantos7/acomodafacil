@@ -56,7 +56,7 @@ export default NextAuth({
     },
     async session({ session, token }) {
       if (token && session.user) {
-        session.user.id = token.id as string;
+        session.user.id = token.id; // Removido "as string" que é sintaxe TypeScript
       }
       return session;
     }

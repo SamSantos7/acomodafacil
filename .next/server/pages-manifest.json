@@ -1,6 +1,6 @@
 {
-  "/_app": "pages/_app.js",
   "/_error": "pages/_error.js",
+  "/_app": "pages/_app.js",
   "/404": "pages/404.js",
   "/api/auth/[...nextauth]": "pages/api/auth/[...nextauth].js",
   "/api/documents/upload": "pages/api/documents/upload.js",
