@@ -1,8 +1,8 @@
 {
-  "/_error": "pages/_error.js",
   "/_app": "pages/_app.js",
+  "/_error": "pages/_error.js",
   "/404": "pages/404.js",
-  "/api/documents/upload": "pages/api/documents/upload.js",
   "/api/auth/[...nextauth]": "pages/api/auth/[...nextauth].js",
+  "/api/documents/upload": "pages/api/documents/upload.js",
   "/_document": "pages/_document.js"
 }
