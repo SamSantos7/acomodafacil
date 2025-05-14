@@ -153,6 +153,10 @@ export const mockApi = {
 
 // Serviço de API simulada para desenvolvimento
 
+// Importe as dependências necessárias
+import { v4 as uuidv4 } from 'uuid';
+
+// Defina as interfaces
 // Remover esta segunda definição de mockApi e suas interfaces associadas
 // interface User {
 //   id: string;
@@ -167,34 +171,21 @@ export const mockApi = {
 // }
 
 // const mockApi = {
+// Autenticação
   login: async (email: string, password: string): Promise<LoginResponse> => {
     // Simular um atraso de rede
-    await new Promise(resolve => setTimeout(resolve, 800));
+    await new Promise(resolve => setTimeout(resolve, 1000));
     
-    // Verificar credenciais (simulado)
-    if (email === 'teste@exemplo.com' && password === 'senha123') {
+    // Simular verificação de credenciais (em um sistema real, verificaríamos no banco de dados)
+    if (email === 'estudante@exemplo.com' && password === 'senha123') {
       return {
         user: {
-          id: '123',
-          name: 'Usuário Teste',
-          email: 'teste@exemplo.com',
-          avatar: 'https://i.pravatar.cc/150?u=123'
+          id: '1',
+          name: 'Estudante Exemplo',
+          email: 'estudante@exemplo.com',
+          avatar: 'https://i.pravatar.cc/150?u=estudante@exemplo.com'
         },
         token: 'jwt-token-simulado-123456789'
-      };
-    }
-    
-    // Simular login para qualquer email com senha não vazia
-    if (password && password.length > 0) {
-      const username = email.split('@')[0];
-      return {
-        user: {
-          id: Math.random().toString(36).substring(2, 9),
-          name: username.charAt(0).toUpperCase() + username.slice(1),
-          email: email,
-          avatar: `https://i.pravatar.cc/150?u=${email}`
-        },
-        token: `jwt-token-simulado-${Math.random().toString(36).substring(2, 15)}`
       };
     }
     
@@ -218,6 +209,28 @@ export const mockApi = {
     };
   },
   
+  // Documentos
+  getDocuments: async () => {
+    await new Promise(resolve => setTimeout(resolve, 600));
+    return { documents: mockDocuments };
+  },
+  
+  uploadDocument: async (name: string, file: File) => {
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    const newDoc: Document = {
+      id: 'doc-' + uuidv4().substring(0, 8),
+      userId: '1',
+      name,
+      fileUrl: URL.createObjectURL(file),
+      uploadDate: new Date().toISOString(),
+      status: 'pending'
+    };
+    
+    return { document: newDoc };
+  },
+  
+  // OTP (One-Time Password)
   sendOtp: async (email: string): Promise<{ success: boolean }> => {
     // Simular um atraso de rede
     await new Promise(resolve => setTimeout(resolve, 1200));
@@ -226,7 +239,7 @@ export const mockApi = {
     return { success: true };
   },
   
-  verifyOtp: async (email: string, otp: string): Promise<LoginResponse> => {
+  verifyOtp: async (email: string, otp: string) => {
     // Simular um atraso de rede
     await new Promise(resolve => setTimeout(resolve, 800));
     
@@ -245,6 +258,22 @@ export const mockApi = {
     }
     
     throw new Error('Código OTP inválido');
+  }
+  
+  register: async (name: string, email: string, password: string) => {
+    // Simular um atraso de rede
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // Simular registro (em um sistema real, verificaríamos se o email já existe)
+    return {
+      user: {
+        id: Math.random().toString(36).substring(2, 9),
+        name: name,
+        email: email,
+        avatar: `https://i.pravatar.cc/150?u=${email}`
+      },
+      token: `jwt-token-simulado-${Math.random().toString(36).substring(2, 15)}`
+    };
   }
 };
 
